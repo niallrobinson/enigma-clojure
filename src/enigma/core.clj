@@ -20,11 +20,13 @@
   })
 
 (def reflectors {
-    :B {:A "Y", :B "R", :C "U", :D "H", :E "Q", :F "S", :G "L", :I "P", :J "X", :K "N", :M "O", :T "Z", :V "W"};,
+    :B (seq "YRUHQSLDPXNGOKMIEBFZCWVJAT");,
     ; "C":    ['AF', 'BV', 'CP', 'DJ', 'EI', 'GO', 'HY', 'KR', 'LZ', 'MX', 'NW', 'TQ', 'SU'],
     ; "B Dünn":   ['AE', 'BN', 'CK', 'DQ', 'FU', 'GY', 'HW', 'IJ', 'LO', 'MP', 'RX', 'SZ', 'TV'],
     ; "C Dünn":   ['AR', 'BD', 'CO', 'EJ', 'FN', 'GT', 'HK', 'IV', 'LM', 'PW', 'QZ', 'SX', 'UY']
   })
+
+(def plugboard {:A \B, :B \A, :C \D, :D \C, :E \F, :F \E,  :G \H, :H \G})
 
 (defn rotate-rotor
   ([rotor]
@@ -78,14 +80,23 @@
   )
 
 (defn reflect
-  [reflector letter])
+  [reflector letter]
+  (nth reflector (char->int letter)))
+
+(defn plug
+  [plugboard letter]
+    (let [p ((keyword (str letter)) plugboard)]
+      (if p p letter))
+  )
 
 (defn encode-letter 
-  [rotors reflector letter]
-    (-> letter
-        (partial rotors-encode rotors)
-        (partial reflect reflector)
-        (partial rotors-encode (reverse rotors)))
+  [rotors reflector plugboard letter]
+    (->> letter
+        (plug plugboard)
+        (rotors-encode rotors)
+        (reflect reflector)
+        (rotors-encode (reverse rotors))
+        (plug plugboard))
   )
 
 ; (defn rotate

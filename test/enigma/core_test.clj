@@ -70,3 +70,36 @@
       )
   )
 )
+
+(deftest test-rotors-encode
+  (testing "Tests one pass of the group of rotors i.e. without reflections and return")
+  (is (=
+        (rotors-encode [(:I rotors) (:II rotors) (:III rotors)] \A)
+        \G
+        )))
+
+(deftest test-reflect
+  (testing "reflect letter")
+  (is (=
+        (reflect (:B reflectors) \Y)
+        )))
+
+(deftest test-encode-letter
+  (testing "Encoding a letter")
+  (is (=
+        (encode-letter
+          [(:III rotors) (:II rotors) (:I rotors)]
+          (:B reflectors)
+          plugboard
+          \H)
+        \X
+        ))
+    (is (=
+        (encode-letter
+          [(:III rotors) (:II rotors) (:I rotors)]
+          (:B reflectors)
+          plugboard
+          \T)
+        \O
+        ))
+)
