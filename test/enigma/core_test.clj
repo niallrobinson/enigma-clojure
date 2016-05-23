@@ -37,10 +37,36 @@
 
 (deftest test-rotate-rotors
   (testing "Sequence of rotors and nudges")
-  (is (= (let [rotated-rotors (rotate-rotors [(:I rotors) (:II rotors) (:III rotors)])]
-           (map #(:rotation (meta %)) rotated-rotors)
+  (is (= (let [rotated-rotors (rotate-rotors [(:I rotors)
+                                              (:II rotors)
+                                              (:III rotors)])]
+           (map #(:rotation (meta %)) rotated-rotors) ; get positions back
          )
        [1 0 0]
+      )
+  )
+  (is (= (let [rotated-rotors (rotate-rotors [(rotate-rotor (:I rotors) 23)
+                                              (:II rotors)
+                                              (:III rotors)])]
+           (map #(:rotation (meta %)) rotated-rotors)
+         )
+       [24 1 0]
+      )
+  )
+  (is (= (let [rotated-rotors (rotate-rotors [(rotate-rotor (:I rotors) 23)
+                                                (rotate-rotor (:II rotors) 22)
+                                                (:III rotors)])]
+           (map #(:rotation (meta %)) rotated-rotors)
+         )
+       [24 23 1]
+      )
+  )
+  (is (= (let [rotated-rotors (rotate-rotors [(rotate-rotor (:I rotors) 23)
+                                                (rotate-rotor (:II rotors) 22)
+                                                (rotate-rotor (:III rotors) 17)])]
+           (map #(:rotation (meta %)) rotated-rotors)
+         )
+       [24 23 18]
       )
   )
 )
