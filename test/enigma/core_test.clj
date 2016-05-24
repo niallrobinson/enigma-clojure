@@ -64,19 +64,19 @@
         \K
         )))
 
-(deftest test-rotors-encode
+(deftest test-unflipped-rotors-encode
   (testing "Right letter with multiple rotors")
   (is (=
         (rotors-encode (rotate-rotors [(:III rotors) (:II rotors) (:I rotors)]) \G)
         \O
         )))
 
-(deftest test-flipped-rotors-encode
-  (testing "Right letter with multiple rotors but coming back the way")
-  (is (=
-        (rotors-encode (flip-rotors [(:III rotors) (:II rotors) (:I rotors)]) \G)
-        \O
-        )))
+; (deftest test-flipped-rotors-encode
+;   (testing "Right letter with multiple rotors but coming back the way")
+;   (is (=
+;         (rotors-encode (flip-rotors [(:III rotors) (:II rotors) (:I rotors)]) \G)
+;         \O
+;         )))
 
 
 (deftest test-reflect
@@ -86,8 +86,8 @@
         )))
 
 
-; (deftest test-encode-letter
-;   (testing "Encoding a letter")
+(deftest test-encode-letter
+  (testing "Encoding a letter")
 ;   (is (=
 ;         (encode-letter
 ;           [(:III rotors) (:II rotors) (:I rotors)]
@@ -105,14 +105,14 @@
 ;           \H)
 ;         \O
 ;         ))
-;   (is (=
-;         (encode-letter
-;           (rotate-rotors [(:III rotors) (:II rotors) (:I rotors)])
-;           (:B reflectors)
-;           plugboard
-;           \H) ;H G O M O M C P X X
-;         \X
-;         ))
+  (is (=
+        (encode-letter
+          (rotate-rotors [(:III rotors) (:II rotors) (:I rotors)])
+          (:B reflectors)
+          plugboard
+          \H) ;H G O M O M C P X X
+        \X
+        )))
 ;     (is (=
 ;         (encode-letter
 ;           (rotate-rotors [(:III rotors) (:II rotors) (:I rotors)])

@@ -84,16 +84,18 @@
     (rotors-encode (first rotors) (rest rotors) letter))
   ([rotor rotors letter]
    (let [nextletter (rotor-encode rotor letter)]
+     (dbg nextletter)
      (if (empty? rotors)
       nextletter
       (recur (first rotors) (rest rotors) nextletter))))
   )
 
-(defn reflect [reflector letter] (nth reflector (char->int letter)))
+(defn reflect [reflector letter] (dbg (nth reflector (char->int letter))) (nth reflector (char->int letter)))
 
 (defn plug
   [plugboard letter]
   (let [p ((keyword (str letter)) plugboard)]
+    (dbg (if p p letter))
     (if p p letter))
   )
 
