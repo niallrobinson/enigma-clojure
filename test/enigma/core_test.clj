@@ -91,15 +91,46 @@
           [(:III rotors) (:II rotors) (:I rotors)]
           (:B reflectors)
           plugboard
+          \A)
+        \B
+        ))
+  (is (=
+        (encode-letter
+          [(:III rotors) (:II rotors) (:I rotors)]
+          (:B reflectors)
+          plugboard
           \H)
+        \O
+        ))
+  (is (=
+        (encode-letter
+          (rotate-rotors [(:III rotors) (:II rotors) (:I rotors)])
+          (:B reflectors)
+          plugboard
+          \H) ;H G O M O M C P X X
         \X
         ))
     (is (=
         (encode-letter
-          [(:III rotors) (:II rotors) (:I rotors)]
+          (rotate-rotors [(:III rotors) (:II rotors) (:I rotors)])
           (:B reflectors)
           plugboard
           \T)
         \O
         ))
 )
+
+(deftest test-encode-string
+  (testing "Encoding then decoding gives the same thing")
+  (let [encoded (encode-string
+                  [(:III rotors) (:II rotors) (:I rotors)]
+                  (:B reflectors)
+                  plugboard
+                  "HELLOWORLD")]
+  (is (= (encode-string
+                  [(:III rotors) (:II rotors) (:I rotors)]
+                  (:B reflectors)
+                  plugboard
+                  encoded)
+        "HELLOWORLD"
+        ))))

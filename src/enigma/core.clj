@@ -6,10 +6,10 @@
   [& args]
   (println "Hello, World!"))
 
-(def rotors {
-    :I (with-meta (seq "EKMFLGDQVZNTOWYHXUSPAIBRCJ") {:nudge \R :rotation 0}),
-    :II (with-meta (seq "AJDKSIRUXBLHWTMCQGZNPYFVOE") {:nudge \F :rotation 0}),
-    :III (with-meta (seq "BDFHJLCPRTXVZNYEIWGAKMUSQO") {:nudge \W :rotation 0});,
+(def rotor-maps {
+  :I (with-meta (seq "EKMFLGDQVZNTOWYHXUSPAIBRCJ") {:nudge \R :rotation 0}),
+  :II (with-meta (seq "AJDKSIRUXBLHWTMCQGZNPYFVOE") {:nudge \F :rotation 0}),
+  :III (with-meta (seq "BDFHJLCPRTXVZNYEIWGAKMUSQO") {:nudge \W :rotation 0});,
     ; "IV"    : { mapper: "ESOVPZJAYQUIRHXLNFTGKDCMWB", step: "K"},
     ; "V"     : { mapper: "VZBRGITYUPSDNHLXAWMJQOFECK", step: "A"},
     ; "VI"    : { mapper: "JPGVOUMFYQBENHZRDKASXLICTW", step: "AN"},
@@ -17,16 +17,18 @@
     ; "VIII"  : { mapper: "FKQHTLXOCBJSPDZRAMEWNIUYGV", step: "AN"},
     ; "β"     : { mapper: "LEYJVCNIXWPBQMDRTAKZGFUHOS", step: ""},
     ; "γ"     : { mapper: "FSOKANUERHMBTIYCWLQPZXVGJD", step: ""}
-  })
+    })
 
 (def reflectors {
     :B (seq "YRUHQSLDPXNGOKMIEBFZCWVJAT");,
     ; "C":    ['AF', 'BV', 'CP', 'DJ', 'EI', 'GO', 'HY', 'KR', 'LZ', 'MX', 'NW', 'TQ', 'SU'],
     ; "B Dünn":   ['AE', 'BN', 'CK', 'DQ', 'FU', 'GY', 'HW', 'IJ', 'LO', 'MP', 'RX', 'SZ', 'TV'],
     ; "C Dünn":   ['AR', 'BD', 'CO', 'EJ', 'FN', 'GT', 'HK', 'IV', 'LM', 'PW', 'QZ', 'SX', 'UY']
-  })
+    })
 
 (def plugboard {:A \B, :B \A, :C \D, :D \C, :E \F, :F \E,  :G \H, :H \G})
+
+(defn )
 
 (defn rotate-rotor
   ([rotor]
@@ -34,9 +36,9 @@
   ([rotor nsteps]
    (let [rotation (:rotation (meta rotor))]
     (vary-meta rotor assoc :rotation (mod (+ rotation nsteps) (count rotor)))
+    )
    )
   )
-)
 
 (defn nudge?
   [rotor]
@@ -55,9 +57,9 @@
         (rotate-rotors (first rotors) (rest rotors) updated-rotors)
         (into updated-rotors rotors)
         )
+      )
     )
   )
-)
 
 (defn char->int
   [c]
@@ -66,7 +68,9 @@
 
 (defn rotor-encode
   [rotor letter]
-  (nth rotor (mod (+ (:rotation (meta rotor)) (char->int letter)) (count rotor)))
+  (nth rotor (mod
+   (+ (:rotation (meta rotor)) (char->int letter))
+   (count rotor)))
   )
 
 (defn rotors-encode
@@ -85,19 +89,32 @@
 
 (defn plug
   [plugboard letter]
-    (let [p ((keyword (str letter)) plugboard)]
-      (if p p letter))
+  (let [p ((keyword (str letter)) plugboard)]
+    (if p p letter))
   )
 
 (defn encode-letter 
   [rotors reflector plugboard letter]
-    (->> letter
-        (plug plugboard)
-        (rotors-encode rotors)
-        (reflect reflector)
-        (rotors-encode (reverse rotors))
-        (plug plugboard))
+  (->> letter
+   (plug plugboard)
+   (rotors-encode rotors)
+   (reflect reflector)
+   (rotors-encode (reverse rotors))
+   (plug plugboard))
   )
+
+(defn encode-string
+  ([rotors reflector plugboard string]
+    (let [chars (seq (clojure.string/upper-case string))]
+      (encode-string rotors reflector plugboard (first chars) (rest chars) []))
+    )
+  ([rotors reflector plugboard achar chars new-chars]
+    (let [rotors (rotate-rotors rotors)
+      new-chars (conj new-chars (encode-letter rotors reflector plugboard achar))]
+      (if (empty? chars)
+        (clojure.string/join new-chars)
+        (recur rotors reflector plugboard (first chars) (rest chars) new-chars))
+      )))
 
 ; (defn rotate
 ;   ([rotors]
