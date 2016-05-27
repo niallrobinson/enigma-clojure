@@ -60,17 +60,17 @@
         ))
 )
 
-; (deftest test-encode-string
-;   (testing "Encoding then decoding gives the same thing")
-;   (let [encoded (encode-string
-;                   [(:III rotors) (:II rotors) (:I rotors)]
-;                   (:B reflectors)
-;                   plugboard
-;                   "HELLOWORLD")]
-;   (is (= (encode-string
-;                   [(:III rotors) (:II rotors) (:I rotors)]
-;                   (:B reflectors)
-;                   plugboard
-;                   encoded)
-;         "HELLOWORLD"
-;         ))))
+(deftest test-encode-string
+  (testing "Encoding then decoding gives the same thing")
+  (let [encoded (encode-string
+                  [(:III rotors) (:II rotors) (:I rotors)]
+                  (:B reflectors)
+                  plugboard
+                  "HELLOWORLD")]
+  (is (= (encode-string
+                  [(:III rotors) (:II rotors) (:I rotors)]
+                  (:B reflectors)
+                  plugboard
+                  encoded)
+        "HELLOWORLD"
+        ))))

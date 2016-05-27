@@ -1,23 +1,19 @@
 (ns enigma.core
+  (:require [clojure.math.combinatorics :as combo])
   (:gen-class)
   (:use [debux core]
-        [clojure.set]))
-
-(defn -main
-  [& args]
-  (println "Hello, World!"))
+        [clojure.set]))  
 
 (def alphabet "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 (def raw-alphabet (seq alphabet))
 
-(defn kv-map
-  [ks vs]
-  (zipmap (map keyword (map str ks)) vs))
+(defn kv-map [ks vs] (zipmap (map keyword (map str ks)) vs))
+(defn char-get [c, m] ((keyword (str c)) m))
 
 (def rotors {
-  :I {:letters-out (seq "EKMFLGDQVZNTOWYHXUSPAIBRCJ") :letters-in raw-alphabet :alphabet raw-alphabet :nudge \V},
-  :II {:letters-out (seq "AJDKSIRUXBLHWTMCQGZNPYFVOE") :letters-in raw-alphabet :alphabet raw-alphabet :nudge \E},
-  :III {:letters-out (seq "BDFHJLCPRTXVZNYEIWGAKMUSQO") :letters-in raw-alphabet :alphabet raw-alphabet :nudge \Q};,
+  :I {:letters-out (seq "EKMFLGDQVZNTOWYHXUSPAIBRCJ") :letters-in raw-alphabet :alphabet raw-alphabet :nudge \V :name "I"},
+  :II {:letters-out (seq "AJDKSIRUXBLHWTMCQGZNPYFVOE") :letters-in raw-alphabet :alphabet raw-alphabet :nudge \E :name "II"},
+  :III {:letters-out (seq "BDFHJLCPRTXVZNYEIWGAKMUSQO") :letters-in raw-alphabet :alphabet raw-alphabet :nudge \Q :name "III"};,
     ; "IV"    : { mapper: "ESOVPZJAYQUIRHXLNFTGKDCMWB", step: "K"},
     ; "V"     : { mapper: "VZBRGITYUPSDNHLXAWMJQOFECK", step: "A"},
     ; "VI"    : { mapper: "JPGVOUMFYQBENHZRDKASXLICTW", step: "AN"},
@@ -36,10 +32,7 @@
 
 (def plugboard {:A \B, :B \A, :C \D, :D \C, :E \F, :F \E,  :G \H, :H \G})
 
-(defn rotate
-  [wheel]
-    (concat (rest wheel) [(first wheel)])
-  )
+(defn rotate [wheel] (concat (rest wheel) [(first wheel)]))
 
 (defn flip-rotor
   [rotor]
@@ -55,10 +48,6 @@
       (update :letters-out rotate)
   )
 )
-
-(defn char-get
-  [c, m]
-  ((keyword (str c)) m))
 
 (defn nudge?
   [rotor]
@@ -100,8 +89,7 @@
       (recur (first rotors) (rest rotors) nextletter))))
   )
 
-(defn reflect [reflector letter]
-  (char-get letter reflector))
+(defn reflect [reflector letter] (char-get letter reflector))
 
 (defn plug
   [plugboard letter]
@@ -134,10 +122,35 @@
         (recur rotors reflector plugboard (first chars) (rest chars) new-chars))
       )))
 
-; (defn rotate
-;   ([rotors]
-;    (rotate (first rotors) (rest rotors)) [])
-;   ([rotor rotors rotated-rotors]
-;    (let [rotated-rotor (rotate-rotor rotor)]
-;      (if rotated-rotor)))
-;   )
+(defn solution?
+  [stringin stringout args]
+  (dbg (conj args stringin))
+  (= (apply encode-string (conj args stringin))
+     stringout)
+)
+
+(defn output
+  [args]
+  (print "Enigma cracked with\n"
+         "Rotors: " (:name (nth args 0)) "\n"
+         "Reflector:" (nth args 1) "\n"
+         "Plugboard: " (nth args 2) "\n")
+)
+
+(defn crack 
+  [rotors reflectors plugboards stringin stringout]
+  (let [rotor-combs (combo/permutations rotors)
+        argss (combo/cartesian-product rotor-combs reflectors plugboards)]
+        (output (first (filter (partial solution? stringin stringout) argss)))
+  )
+)
+
+(defn -main
+  []
+  (crack
+    (vals (select-keys rotors [:I :II :III]))
+    (vals (select-keys reflectors [:B]))
+    [plugboard]
+    "XKHCELGHAX"
+    "HEILHITLER")  
+)
