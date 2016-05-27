@@ -43,19 +43,26 @@
 
 (defn flip-rotor
   [rotor]
-  {:letters-in (:letters-out rotor), :letters-out (:letters-in rotor), :nudge (:nudge rotor)})
+  {:letters-in (:letters-out rotor),
+   :letters-out (:letters-in rotor),
+   :alphabet (:alphabet rotor),
+   :nudge (:nudge rotor)})
 
 (defn rotate-rotor
   [rotor]
   (-> rotor 
       (update :letters-in rotate)
-      (update :alphabet rotate)
+      (update :letters-out rotate)
   )
 )
 
+(defn char-get
+  [c, m]
+  ((keyword (str c)) m))
+
 (defn nudge?
   [rotor]
-  (= (first (:alphabet rotor))
+  (= (first (:letters-in rotor))
      (:nudge rotor)
     )
   )
@@ -75,9 +82,12 @@
 
 (defn codec
   [rotor letter]
-  (dbg "codec")
-  (dbg ((keyword (str letter)) (kv-map (:letters-in rotor) (:letters-out rotor))))
-  ((keyword (str letter)) (kv-map (:letters-in rotor) (:letters-out rotor)))
+  (let [alphabet-out-map (kv-map (:alphabet rotor) (:letters-out rotor))
+        in-alphabet-map (kv-map (:letters-in rotor) (:alphabet rotor))]
+      (-> letter
+          (char-get alphabet-out-map)
+          (char-get in-alphabet-map))
+  )
 )
 
 (defn rotors-encode
@@ -85,22 +95,17 @@
     (rotors-encode (first rotors) (rest rotors) letter))
   ([rotor rotors letter]
    (let [nextletter (codec rotor letter)]
-     (dbg nextletter)
      (if (empty? rotors)
       nextletter
       (recur (first rotors) (rest rotors) nextletter))))
   )
 
 (defn reflect [reflector letter]
-  (dbg "Reflector")
-  (dbg (keyword (str letter) reflector))
-  (keyword (str letter) reflector))
+  (char-get letter reflector))
 
 (defn plug
   [plugboard letter]
   (let [p ((keyword (str letter)) plugboard)]
-    (dbg "Plugboard")
-    (dbg (if p p letter))
     (if p p letter))
   )
 

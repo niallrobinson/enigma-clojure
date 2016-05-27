@@ -44,7 +44,7 @@
 (is (=
       (rotors-encode (rotate-rotors [(:III rotors)
                                      (:II rotors)
-                                     (:I rotors)]) \H)
+                                     (:I rotors)]) \G)
       \O))
 )
 
@@ -59,31 +59,6 @@
         \X
         ))
 )
-; ;   (is (=
-; ;         (encode-letter
-; ;           [(:III rotors) (:II rotors) (:I rotors)]
-; ;           (:B reflectors)
-; ;           plugboard
-; ;           \H)
-; ;         \O
-; ;         ))
-;   (is (=
-;         (encode-letter
-;           (rotate-rotors [(:III rotors) (:II rotors) (:I rotors)])
-;           (:B reflectors)
-;           plugboard
-;           \H) ;H G O M O M C P X X
-;         \X
-;         )))
-; ;   (is (=
-; ;       (encode-letter
-; ;         (rotate-rotors [(:III rotors) (:II rotors) (:I rotors)])
-; ;         (:B reflectors)
-; ;         plugboard
-; ;         \T)
-; ;       \O
-; ;       ))
-; ; )
 
 ; (deftest test-encode-string
 ;   (testing "Encoding then decoding gives the same thing")
