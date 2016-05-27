@@ -1,21 +1,23 @@
 (ns enigma.core
   (:gen-class)
-  (:use [debux core]))
+  (:use [debux core]
+        [clojure.set]))
 
 (defn -main
   [& args]
   (println "Hello, World!"))
 
-(def ref-map (seq "ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+(def alphabet "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+(def raw-alphabet (seq alphabet))
 
-(defn char->int [c] (- (int c) 65)) ;to get a->1, b->2 etc
-
-(defn map->deltas [rotor-map] (map #(- (char->int %1) (char->int %2)) rotor-map ref-map))
+(defn kv-map
+  [ks vs]
+  (zipmap (map keyword (map str ks)) vs))
 
 (def rotors {
-  :I (with-meta (map->deltas (seq "EKMFLGDQVZNTOWYHXUSPAIBRCJ")) {:nudge 23 :rotation 0}),
-  :II (with-meta (map->deltas (seq "AJDKSIRUXBLHWTMCQGZNPYFVOE")) {:nudge 22 :rotation 0}),
-  :III (with-meta (map->deltas (seq "BDFHJLCPRTXVZNYEIWGAKMUSQO")) {:nudge 17 :rotation 0});,
+  :I {:letters-out (seq "EKMFLGDQVZNTOWYHXUSPAIBRCJ") :letters-in raw-alphabet :alphabet raw-alphabet :nudge \V},
+  :II {:letters-out (seq "AJDKSIRUXBLHWTMCQGZNPYFVOE") :letters-in raw-alphabet :alphabet raw-alphabet :nudge \E},
+  :III {:letters-out (seq "BDFHJLCPRTXVZNYEIWGAKMUSQO") :letters-in raw-alphabet :alphabet raw-alphabet :nudge \Q};,
     ; "IV"    : { mapper: "ESOVPZJAYQUIRHXLNFTGKDCMWB", step: "K"},
     ; "V"     : { mapper: "VZBRGITYUPSDNHLXAWMJQOFECK", step: "A"},
     ; "VI"    : { mapper: "JPGVOUMFYQBENHZRDKASXLICTW", step: "AN"},
@@ -26,7 +28,7 @@
     })
 
 (def reflectors {
-    :B (seq "YRUHQSLDPXNGOKMIEBFZCWVJAT");,
+    :B (kv-map raw-alphabet (seq "YRUHQSLDPXNGOKMIEBFZCWVJAT"));,
     ; "C":    ['AF', 'BV', 'CP', 'DJ', 'EI', 'GO', 'HY', 'KR', 'LZ', 'MX', 'NW', 'TQ', 'SU'],
     ; "B Dünn":   ['AE', 'BN', 'CK', 'DQ', 'FU', 'GY', 'HW', 'IJ', 'LO', 'MP', 'RX', 'SZ', 'TV'],
     ; "C Dünn":   ['AR', 'BD', 'CO', 'EJ', 'FN', 'GT', 'HK', 'IV', 'LM', 'PW', 'QZ', 'SX', 'UY']
@@ -34,21 +36,27 @@
 
 (def plugboard {:A \B, :B \A, :C \D, :D \C, :E \F, :F \E,  :G \H, :H \G})
 
-(defn rotate-rotor
-  ([rotor]
-   (rotate-rotor rotor 1))
-  ([rotor nsteps]
-   (let [rotation (:rotation (meta rotor))]
-    (vary-meta rotor assoc :rotation (mod (+ rotation nsteps) (count rotor)))
-    )
-   )
+(defn rotate
+  [wheel]
+    (concat (rest wheel) [(first wheel)])
   )
+
+(defn flip-rotor
+  [rotor]
+  {:letters-in (:letters-out rotor), :letters-out (:letters-in rotor), :nudge (:nudge rotor)})
+
+(defn rotate-rotor
+  [rotor]
+  (-> rotor 
+      (update :letters-in rotate)
+      (update :alphabet rotate)
+  )
+)
 
 (defn nudge?
   [rotor]
-  (= 
-    (:rotation (meta rotor))
-    (:nudge (meta rotor))
+  (= (first (:alphabet rotor))
+     (:nudge rotor)
     )
   )
 
@@ -65,42 +73,38 @@
     )
   )
 
-(defn get-delta
+(defn codec
   [rotor letter]
-  (nth rotor (mod
-   (+ (:rotation (meta rotor)) (char->int letter))
-   (count rotor))))
-
-(defn rotor-encode
-  [rotor letter]
-  (nth ref-map
-       (mod (+
-              (char->int letter)
-              (get-delta rotor letter))
-            (count rotor))))
+  (dbg "codec")
+  (dbg ((keyword (str letter)) (kv-map (:letters-in rotor) (:letters-out rotor))))
+  ((keyword (str letter)) (kv-map (:letters-in rotor) (:letters-out rotor)))
+)
 
 (defn rotors-encode
   ([rotors letter]
     (rotors-encode (first rotors) (rest rotors) letter))
   ([rotor rotors letter]
-   (let [nextletter (rotor-encode rotor letter)]
+   (let [nextletter (codec rotor letter)]
      (dbg nextletter)
      (if (empty? rotors)
       nextletter
       (recur (first rotors) (rest rotors) nextletter))))
   )
 
-(defn reflect [reflector letter] (dbg (nth reflector (char->int letter))) (nth reflector (char->int letter)))
+(defn reflect [reflector letter]
+  (dbg "Reflector")
+  (dbg (keyword (str letter) reflector))
+  (keyword (str letter) reflector))
 
 (defn plug
   [plugboard letter]
   (let [p ((keyword (str letter)) plugboard)]
+    (dbg "Plugboard")
     (dbg (if p p letter))
     (if p p letter))
   )
 
-(defn neg-seq [s] (with-meta (map #(* -1 %) s) (meta s)))
-(defn flip-rotors [rotors] (into [] (reverse (map neg-seq rotors))))
+(defn flip-rotors [rotors] (into [] (reverse (map flip-rotor rotors))))
 
 (defn encode-letter 
   [rotors reflector plugboard letter]
