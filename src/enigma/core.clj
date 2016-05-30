@@ -25,10 +25,10 @@
   })
 
 (def reflectors {
-    :B (with-meta (kv-map raw-alphabet (seq "YRUHQSLDPXNGOKMIEBFZCWVJAT")) {:name "B"});,
-    ; "C":    ['AF', 'BV', 'CP', 'DJ', 'EI', 'GO', 'HY', 'KR', 'LZ', 'MX', 'NW', 'TQ', 'SU'],
-    ; "B Dünn":   ['AE', 'BN', 'CK', 'DQ', 'FU', 'GY', 'HW', 'IJ', 'LO', 'MP', 'RX', 'SZ', 'TV'],
-    ; "C Dünn":   ['AR', 'BD', 'CO', 'EJ', 'FN', 'GT', 'HK', 'IV', 'LM', 'PW', 'QZ', 'SX', 'UY']
+    :B (with-meta (kv-map raw-alphabet (seq "YRUHQSLDPXNGOKMIEBFZCWVJAT")) {:name "B"})
+    :C (with-meta (kv-map raw-alphabet (seq "FVPJIAOYEDRZXWGCTKUQSBNMHL")) {:name "C"})
+    :BDünn (with-meta (kv-map raw-alphabet (seq "ENKQAUYWJICOPBLMDXZVFTHRGS")) {:name "B Dünn"})
+    :CDünn (with-meta (kv-map raw-alphabet (seq "RDOBJNTKVEHMLFCWZAXGYIPSUQ")) {:name "C Dünn"})
     })
 
 (def plugboard {:A \B, :B \A, :C \D, :D \C, :E \F, :F \E,  :G \H, :H \G})
@@ -138,20 +138,25 @@
 )
 
 (defn crack 
-  [rotors reflectors plugboards stringin stringout]
-  (let [rotor-combs (combo/permutations rotors)
+  [rotors nrotors reflectors plugboards stringin stringout]
+  (let [rotor-combs (apply concat (map combo/permutations (combo/combinations rotors nrotors)))
         argss (combo/cartesian-product rotor-combs reflectors plugboards)]
-        (print "Calculating" (count argss) "different solutions...\n")
+        (println "Calculating" (count argss) "different solutions...\n") (flush)
         (first (filter (partial solution? stringin stringout) argss))
   )
 )
 
 (defn -main
   [stringin stringout]
-  (output (crack
-    (vals (select-keys rotors [:I :II :III]))
-    (vals (select-keys reflectors [:B]))
-    [plugboard]
-    stringin
-    stringout
-)))
+  (let [solution (crack
+          (vals (select-keys rotors [:I :II :III :IV :V :β :γ]))
+          3
+          (vals (select-keys reflectors [:B :C :BDünn :CDünn]))
+          [plugboard]
+          stringin
+          stringout)]
+  (if solution
+    (output solution)
+    (println "No solution found"))
+  )
+)

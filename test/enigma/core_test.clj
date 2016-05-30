@@ -89,6 +89,7 @@
   (is (=
         (crack
           (vals (select-keys rotors [:I :II :III]))
+          3
           (vals (select-keys reflectors [:B]))
           [plugboard]
           "XKHCELGHAX"
