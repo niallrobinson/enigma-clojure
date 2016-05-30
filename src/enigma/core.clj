@@ -11,13 +11,13 @@
 (defn char-get [c, m] ((keyword (str c)) m))
 
 (def rotors {
-  :I {:letters-out (seq "EKMFLGDQVZNTOWYHXUSPAIBRCJ") :letters-in raw-alphabet :alphabet raw-alphabet :nudge \V :name "I"},
-  :II {:letters-out (seq "AJDKSIRUXBLHWTMCQGZNPYFVOE") :letters-in raw-alphabet :alphabet raw-alphabet :nudge \E :name "II"},
-  :III {:letters-out (seq "BDFHJLCPRTXVZNYEIWGAKMUSQO") :letters-in raw-alphabet :alphabet raw-alphabet :nudge \Q :name "III"},
-  :IV {:letters-out (seq "ESOVPZJAYQUIRHXLNFTGKDCMWB") :letters-in raw-alphabet :alphabet raw-alphabet :nudge \K :name "IV"},
-  :V {:letters-out (seq "VZBRGITYUPSDNHLXAWMJQOFECK") :letters-in raw-alphabet :alphabet raw-alphabet :nudge \A :name "V"},
-  :β {:letters-out (seq "LEYJVCNIXWPBQMDRTAKZGFUHOS") :letters-in raw-alphabet :alphabet raw-alphabet :nudge "" :name "β"},
-  :γ {:letters-out (seq "FSOKANUERHMBTIYCWLQPZXVGJD") :letters-in raw-alphabet :alphabet raw-alphabet :nudge "" :name "γ"},
+  :I {:letters-out (seq "EKMFLGDQVZNTOWYHXUSPAIBRCJ") :letters-in raw-alphabet :alphabet raw-alphabet :nudge #{\V} :name "I"},
+  :II {:letters-out (seq "AJDKSIRUXBLHWTMCQGZNPYFVOE") :letters-in raw-alphabet :alphabet raw-alphabet :nudge #{\E} :name "II"},
+  :III {:letters-out (seq "BDFHJLCPRTXVZNYEIWGAKMUSQO") :letters-in raw-alphabet :alphabet raw-alphabet :nudge #{\Q} :name "III"},
+  :IV {:letters-out (seq "ESOVPZJAYQUIRHXLNFTGKDCMWB") :letters-in raw-alphabet :alphabet raw-alphabet :nudge #{\K} :name "IV"},
+  :V {:letters-out (seq "VZBRGITYUPSDNHLXAWMJQOFECK") :letters-in raw-alphabet :alphabet raw-alphabet :nudge #{\A} :name "V"},
+  :β {:letters-out (seq "LEYJVCNIXWPBQMDRTAKZGFUHOS") :letters-in raw-alphabet :alphabet raw-alphabet :nudge #{} :name "β"},
+  :γ {:letters-out (seq "FSOKANUERHMBTIYCWLQPZXVGJD") :letters-in raw-alphabet :alphabet raw-alphabet :nudge #{} :name "γ"},
   
     ; "VI"    : { mapper: "JPGVOUMFYQBENHZRDKASXLICTW", step: "AN"},
     ; "VII"   : { mapper: "NZJHGRCXMYSWBOUFAIVLPEKQDT", step: "AN"},
@@ -52,8 +52,8 @@
 
 (defn nudge?
   [rotor]
-  (= (first (:letters-in rotor))
-     (:nudge rotor)
+  (contains? (:nudge rotor)
+             (first (:letters-in rotor))
     )
   )
 
