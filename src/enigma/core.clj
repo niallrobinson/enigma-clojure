@@ -13,18 +13,19 @@
 (def rotors {
   :I {:letters-out (seq "EKMFLGDQVZNTOWYHXUSPAIBRCJ") :letters-in raw-alphabet :alphabet raw-alphabet :nudge \V :name "I"},
   :II {:letters-out (seq "AJDKSIRUXBLHWTMCQGZNPYFVOE") :letters-in raw-alphabet :alphabet raw-alphabet :nudge \E :name "II"},
-  :III {:letters-out (seq "BDFHJLCPRTXVZNYEIWGAKMUSQO") :letters-in raw-alphabet :alphabet raw-alphabet :nudge \Q :name "III"};,
-    ; "IV"    : { mapper: "ESOVPZJAYQUIRHXLNFTGKDCMWB", step: "K"},
-    ; "V"     : { mapper: "VZBRGITYUPSDNHLXAWMJQOFECK", step: "A"},
+  :III {:letters-out (seq "BDFHJLCPRTXVZNYEIWGAKMUSQO") :letters-in raw-alphabet :alphabet raw-alphabet :nudge \Q :name "III"},
+  :IV {:letters-out (seq "ESOVPZJAYQUIRHXLNFTGKDCMWB") :letters-in raw-alphabet :alphabet raw-alphabet :nudge \K :name "IV"},
+  :V {:letters-out (seq "VZBRGITYUPSDNHLXAWMJQOFECK") :letters-in raw-alphabet :alphabet raw-alphabet :nudge \A :name "V"},
+  :β {:letters-out (seq "LEYJVCNIXWPBQMDRTAKZGFUHOS") :letters-in raw-alphabet :alphabet raw-alphabet :nudge "" :name "β"},
+  :γ {:letters-out (seq "FSOKANUERHMBTIYCWLQPZXVGJD") :letters-in raw-alphabet :alphabet raw-alphabet :nudge "" :name "γ"},
+  
     ; "VI"    : { mapper: "JPGVOUMFYQBENHZRDKASXLICTW", step: "AN"},
     ; "VII"   : { mapper: "NZJHGRCXMYSWBOUFAIVLPEKQDT", step: "AN"},
     ; "VIII"  : { mapper: "FKQHTLXOCBJSPDZRAMEWNIUYGV", step: "AN"},
-    ; "β"     : { mapper: "LEYJVCNIXWPBQMDRTAKZGFUHOS", step: ""},
-    ; "γ"     : { mapper: "FSOKANUERHMBTIYCWLQPZXVGJD", step: ""}
-    })
+  })
 
 (def reflectors {
-    :B (kv-map raw-alphabet (seq "YRUHQSLDPXNGOKMIEBFZCWVJAT"));,
+    :B (with-meta (kv-map raw-alphabet (seq "YRUHQSLDPXNGOKMIEBFZCWVJAT")) {:name "B"});,
     ; "C":    ['AF', 'BV', 'CP', 'DJ', 'EI', 'GO', 'HY', 'KR', 'LZ', 'MX', 'NW', 'TQ', 'SU'],
     ; "B Dünn":   ['AE', 'BN', 'CK', 'DQ', 'FU', 'GY', 'HW', 'IJ', 'LO', 'MP', 'RX', 'SZ', 'TV'],
     ; "C Dünn":   ['AR', 'BD', 'CO', 'EJ', 'FN', 'GT', 'HK', 'IV', 'LM', 'PW', 'QZ', 'SX', 'UY']
@@ -124,16 +125,15 @@
 
 (defn solution?
   [stringin stringout args]
-  (dbg (conj args stringin))
-  (= (apply encode-string (conj args stringin))
+  (= (apply encode-string (concat args [stringin]))
      stringout)
 )
 
 (defn output
   [args]
   (print "Enigma cracked with\n"
-         "Rotors: " (:name (nth args 0)) "\n"
-         "Reflector:" (nth args 1) "\n"
+         "Rotors: " (map :name (nth args 0)) "\n"
+         "Reflector:" (:name (meta (nth args 1))) "\n"
          "Plugboard: " (nth args 2) "\n")
 )
 
@@ -141,16 +141,17 @@
   [rotors reflectors plugboards stringin stringout]
   (let [rotor-combs (combo/permutations rotors)
         argss (combo/cartesian-product rotor-combs reflectors plugboards)]
-        (output (first (filter (partial solution? stringin stringout) argss)))
+        (print "Calculating" (count argss) "different solutions...\n")
+        (first (filter (partial solution? stringin stringout) argss))
   )
 )
 
 (defn -main
-  []
-  (crack
+  [stringin stringout]
+  (output (crack
     (vals (select-keys rotors [:I :II :III]))
     (vals (select-keys reflectors [:B]))
     [plugboard]
-    "XKHCELGHAX"
-    "HEILHITLER")  
-)
+    stringin
+    stringout
+)))

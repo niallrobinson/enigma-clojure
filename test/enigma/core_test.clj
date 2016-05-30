@@ -60,17 +60,40 @@
         ))
 )
 
+
+(deftest test-solution?
+  (let [args  [[(:III rotors) (:II rotors) (:I rotors)]
+              (:B reflectors)
+              plugboard ]
+       ]
+    (is (solution? "HELLOWORLD" "XKACBBMTBF" args))
+  )
+)
+
 (deftest test-encode-string
   (testing "Encoding then decoding gives the same thing")
   (let [encoded (encode-string
                   [(:III rotors) (:II rotors) (:I rotors)]
-                  (:B reflectors)
-                  plugboard
-                  "HELLOWORLD")]
+                   (:B reflectors)
+                   plugboard
+                   "HELLOWORLD")]
   (is (= (encode-string
                   [(:III rotors) (:II rotors) (:I rotors)]
-                  (:B reflectors)
-                  plugboard
-                  encoded)
+                   (:B reflectors)
+                   plugboard
+                   encoded)
         "HELLOWORLD"
         ))))
+
+(deftest test-crack
+  (is (=
+        (crack
+          (vals (select-keys rotors [:I :II :III]))
+          (vals (select-keys reflectors [:B]))
+          [plugboard]
+          "XKHCELGHAX"
+          "HEILHITLER")
+        [(vals (select-keys rotors [:III :II :I]))
+          (:B reflectors)
+          {:A \B, :B \A, :C \D, :D \C, :E \F, :F \E,  :G \H, :H \G}]
+)))
