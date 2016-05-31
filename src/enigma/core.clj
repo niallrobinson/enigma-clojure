@@ -122,12 +122,6 @@
         (recur rotors reflector plugboard (first chars) (rest chars) new-chars))
       )))
 
-(defn solution?
-  [stringin stringout args]
-  (= (apply encode-string (concat args [stringin]))
-     stringout)
-)
-
 (defn output
   [args]
   (print "Enigma cracked with\n"
@@ -136,15 +130,26 @@
          "Plugboard: " (nth args 2) "\n")
 )
 
-; (defn get-rotations
-;   [rotor]
-; )
+(defn solution?
+  [stringin stringout args]
+  (= (apply encode-string (concat args [stringin]))
+     stringout)
+)
+
+(defn get-rotor-rotations
+  [rotor]
+  (take 26 (iterate rotate-rotor rotor))
+)
+
+(defn get-rotors-rotations
+  [rotors]
+  (apply combo/cartesian-product (map get-rotor-rotations rotors))
+)
 
 (defn crack 
   [rotors nrotors reflectors plugboards stringin stringout]
-  (let [rotor-combs (apply concat (map combo/permutations (combo/combinations rotors nrotors)))
+  (let [rotor-combs (apply concat (map get-rotors-rotations (apply concat (map combo/permutations (combo/combinations rotors nrotors)))))
         argss (combo/cartesian-product rotor-combs reflectors plugboards)]
-        (println "Calculating" (count argss) "different solutions...\n") (flush)
         (first (filter (partial solution? stringin stringout) argss))
   )
 )
@@ -152,7 +157,7 @@
 (defn -main
   [stringin stringout]
   (let [solution (crack
-          (vals (select-keys rotors [:I :II :III :IV :V :VI :VII :VIII :V :β :γ]))
+          (vals (select-keys rotors [:I :II :III])) ; this is in the wrong place
           3
           (vals (select-keys reflectors [:B :C :BDünn :CDünn]))
           [plugboard]
