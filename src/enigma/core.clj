@@ -16,12 +16,11 @@
   :III {:letters-out (seq "BDFHJLCPRTXVZNYEIWGAKMUSQO") :letters-in raw-alphabet :alphabet raw-alphabet :nudge #{\Q} :name "III"},
   :IV {:letters-out (seq "ESOVPZJAYQUIRHXLNFTGKDCMWB") :letters-in raw-alphabet :alphabet raw-alphabet :nudge #{\K} :name "IV"},
   :V {:letters-out (seq "VZBRGITYUPSDNHLXAWMJQOFECK") :letters-in raw-alphabet :alphabet raw-alphabet :nudge #{\A} :name "V"},
+  :VI {:letters-out (seq "JPGVOUMFYQBENHZRDKASXLICTW") :letters-in raw-alphabet :alphabet raw-alphabet :nudge #{\A \N} :name "VI"},
+  :VII {:letters-out (seq "NZJHGRCXMYSWBOUFAIVLPEKQDT") :letters-in raw-alphabet :alphabet raw-alphabet :nudge #{\A \N} :name "VII"},
+  :VIII {:letters-out (seq "FKQHTLXOCBJSPDZRAMEWNIUYGV") :letters-in raw-alphabet :alphabet raw-alphabet :nudge #{\A \N} :name "VII"},
   :β {:letters-out (seq "LEYJVCNIXWPBQMDRTAKZGFUHOS") :letters-in raw-alphabet :alphabet raw-alphabet :nudge #{} :name "β"},
-  :γ {:letters-out (seq "FSOKANUERHMBTIYCWLQPZXVGJD") :letters-in raw-alphabet :alphabet raw-alphabet :nudge #{} :name "γ"},
-  
-    ; "VI"    : { mapper: "JPGVOUMFYQBENHZRDKASXLICTW", step: "AN"},
-    ; "VII"   : { mapper: "NZJHGRCXMYSWBOUFAIVLPEKQDT", step: "AN"},
-    ; "VIII"  : { mapper: "FKQHTLXOCBJSPDZRAMEWNIUYGV", step: "AN"},
+  :γ {:letters-out (seq "FSOKANUERHMBTIYCWLQPZXVGJD") :letters-in raw-alphabet :alphabet raw-alphabet :nudge #{} :name "γ"}
   })
 
 (def reflectors {
@@ -137,6 +136,10 @@
          "Plugboard: " (nth args 2) "\n")
 )
 
+; (defn get-rotations
+;   [rotor]
+; )
+
 (defn crack 
   [rotors nrotors reflectors plugboards stringin stringout]
   (let [rotor-combs (apply concat (map combo/permutations (combo/combinations rotors nrotors)))
@@ -149,7 +152,7 @@
 (defn -main
   [stringin stringout]
   (let [solution (crack
-          (vals (select-keys rotors [:I :II :III :IV :V :β :γ]))
+          (vals (select-keys rotors [:I :II :III :IV :V :VI :VII :VIII :V :β :γ]))
           3
           (vals (select-keys reflectors [:B :C :BDünn :CDünn]))
           [plugboard]
