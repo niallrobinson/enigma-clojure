@@ -4,9 +4,9 @@
 
 (defn uncrackable-no-args
   []
-  (crack (vals (select-keys rotors [:I :II :III :IV :V :VI :VII :VIII :V :β :γ]))
+  (crack (vals (select-keys rotors [:I :II :III]))
   3
-  (vals (select-keys reflectors [:B :C :BDünn :CDünn]))
+  (vals (select-keys reflectors [:B :C]))
   [plugboard]
   "XKHCELGHAX"
   "FEILHITLER"))
@@ -28,7 +28,7 @@
   uncrackable-no-args
 )
 
-(defcase crack-bench :default
-  []
-  crackable-no-args
-)
+; (defcase crack-bench :default
+;   []
+;   crackable-no-args
+; )

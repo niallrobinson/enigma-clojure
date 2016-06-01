@@ -1,5 +1,6 @@
 (ns enigma.core
-  (:require [clojure.math.combinatorics :as combo])
+  (:require [clojure.math.combinatorics :as combo]
+            [tesser.core :as t])
   (:gen-class)
   (:use [debux core]
         [clojure.set]))  
@@ -122,12 +123,15 @@
         (recur rotors reflector plugboard (first chars) (rest chars) new-chars))
       )))
 
-(defn output
+(defn output [args]
+  (print args))
+
+(defn get-output
   [args]
-  (print "Enigma cracked with\n"
-         "Rotors: " (map :name (nth args 0)) "\n"
-         "Reflector:" (:name (meta (nth args 1))) "\n"
-         "Plugboard: " (nth args 2) "\n")
+  (str "Enigma cracked with\n"
+        "Rotors: " (map :name (nth args 0)) "\n"
+        "Reflector:" (:name (meta (nth args 1))) "\n"
+        "Plugboard: " (nth args 2) "\n")
 )
 
 (defn solution?
@@ -159,7 +163,7 @@
   (let [solution (crack
           (vals (select-keys rotors [:I :II :III])) ; this is in the wrong place
           3
-          (vals (select-keys reflectors [:B :C :BDünn :CDünn]))
+          (vals (select-keys reflectors [:B :C]))
           [plugboard]
           stringin
           stringout)]
