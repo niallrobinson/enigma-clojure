@@ -1,6 +1,5 @@
 (ns enigma.core
-  (:require [clojure.math.combinatorics :as combo]
-            [tesser.core :as t])
+  (:require [clojure.math.combinatorics :as combo])
   (:gen-class)
   (:use [debux core]
         [clojure.set]))  
