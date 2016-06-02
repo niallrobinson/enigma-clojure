@@ -1,5 +1,6 @@
 (ns enigma.core
-  (:require [clojure.math.combinatorics :as combo])
+  (:require [clojure.math.combinatorics :as combo]
+            [swiss.arrows :refer :all])
   (:gen-class)
   (:use [debux core]
         [clojure.set]))  
@@ -139,19 +140,17 @@
      stringout)
 )
 
-(defn get-rotor-rotations
-  [rotor]
-  (take 26 (iterate rotate-rotor rotor))
-)
-
-(defn get-rotors-rotations
-  [rotors]
-  (apply combo/cartesian-product (map get-rotor-rotations rotors))
-)
+(defn get-rotor-rotations [rotor] (take 26 (iterate rotate-rotor rotor)))
+(defn get-rotors-rotations [rotors] (apply combo/cartesian-product (map get-rotor-rotations rotors)))
 
 (defn crack 
   [rotors nrotors reflectors plugboards stringin stringout]
-  (let [rotor-combs (apply concat (map get-rotors-rotations (apply concat (map combo/permutations (combo/combinations rotors nrotors)))))
+  (let [rotor-combs (-<> rotors
+                         (combo/combinations <> nrotors)
+                         (map combo/permutations <>)
+                         (apply concat <>)
+                         (map get-rotors-rotations <>)
+                         (apply concat <>))
         argss (combo/cartesian-product rotor-combs reflectors plugboards)]
         (first (filter (partial solution? stringin stringout) argss))
   )
