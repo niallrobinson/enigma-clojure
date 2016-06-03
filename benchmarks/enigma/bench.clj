@@ -1,6 +1,11 @@
 (ns enigma.bench
   (:use perforate.core)
-  (:require [enigma.core :refer :all]))
+  (:require [enigma.core :refer :all]
+            [enigma.rotorops :refer :all]
+            [enigma.utils :refer :all]
+            [enigma.constants :refer :all]
+            [enigma.encode :refer :all]
+            [enigma.codecs :refer :all]))
 
 
 ; (defgoal crack-bench
