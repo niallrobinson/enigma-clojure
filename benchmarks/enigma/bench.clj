@@ -16,11 +16,14 @@
 ;   "FEILHITLER"))
 
 (defgoal encode
-  "Test the steps for encoding")
+  "Test the steps for encoding"
+  :setup (fn []
+          [(vals (select-keys rotors [:I :II :III]))
+           (:I rotors)]))
 
-(defcase encode :cyphur
+(defcase encode :encode-pass
   "One complete cyphur"
-  []
+  [r rs]
   (encode-string 
       (vals (select-keys rotors [:I :II :III]))
       (:B reflectors)
@@ -29,8 +32,17 @@
 
 (defcase encode :rotate
   "One rotation"
-  []
-  (rotate-rotors (vals (select-keys rotors [:I :II :III]))))
+  [r rs]
+  (rotate-rotors rs))
+
+(defcase encode :rotor-encode
+  "One rotation"
+  [r rs]
+  (codec r "A"))
+
+(defcase encode :map-and-get
+  [r rs]
+  (:A (kv-map (:alphabet r) (:letters-out r))))
 
 ; (defcase crack-bench :default
 ;   []

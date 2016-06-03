@@ -1,19 +1,23 @@
 (ns enigma.core-test
   (:require [clojure.test :refer :all]
-            [enigma.core :refer :all])
+            [enigma.core :refer :all]
+            [enigma.constants :refer :all]
+            [enigma.rotorops :refer :all]
+            [enigma.codecs :refer :all]
+            [enigma.encode :refer :all]
+            [enigma.crack :refer :all])
+  
   (:use [debux core]))
 
 (deftest test-codec
   (is (=
       (codec (:I rotors) \A)
-      \E))
-  )
+      \E)))
 
 (deftest test-rotate
   (is (=
       (codec (rotate-rotor (:I rotors)) \A)
-      \J))
-  )
+      \J)))
 
 (deftest test-plugboard
   (is (= 
@@ -21,8 +25,7 @@
         \B))
   (is (= 
         (plug plugboard \Z)
-        \Z))
-)
+        \Z)))
 
 (deftest test-flip-rotor
   (is (= 
@@ -32,8 +35,7 @@
               (codec (flip-rotor r))
           )
         )
-        \A
-)))
+        \A)))
 
 (deftest test-one-rotors-pass
   (is (=
@@ -45,8 +47,7 @@
       (rotors-encode (rotate-rotors [(:III rotors)
                                      (:II rotors)
                                      (:I rotors)]) \G)
-      \O))
-)
+      \O)))
 
 (deftest test-encode-letter
   (testing "Encoding a letter")
@@ -56,19 +57,14 @@
           (:B reflectors)
           plugboard
           \H)
-        \X
-        ))
-)
+        \X)))
 
 
 (deftest test-solution?
   (let [args  [[(:III rotors) (:II rotors) (:I rotors)]
               (:B reflectors)
-              plugboard ]
-       ]
-    (is (solution? "HELLOWORLD" "XKACBBMTBF" args))
-  )
-)
+              plugboard]]
+    (is (solution? "HELLOWORLD" "XKACBBMTBF" args))))
 
 (deftest test-encode-string
   (testing "Encoding then decoding gives the same thing")
@@ -82,8 +78,7 @@
                    (:B reflectors)
                    plugboard
                    encoded)
-        "HELLOWORLD"
-        ))))
+        "HELLOWORLD"))))
 
 (deftest test-crack ; just tests that is runs
   (is (crack
@@ -92,5 +87,4 @@
           (vals (select-keys reflectors [:CDünn]))
           [plugboard]
           "AGBRTNABII"
-          "HEILHITLER")
-))
+          "HEILHITLER")))
